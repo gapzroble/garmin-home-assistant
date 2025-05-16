@@ -1,0 +1,93 @@
+{
+  "$schema": "https://raw.githubusercontent.com/house-of-abbey/GarminHomeAssistant/main/config.schema.json",
+  "title": "Home",
+  "items": [
+    {
+      "entity": "sensor.solar_power",
+      "name": "Solar",
+      "type": "info",
+      "content": "{{ '{:.2f}'.format(states('sensor.solar_power')|float(0)) }} kW"
+    },    
+    {
+      "entity": "sensor.battery_discharging",
+      "name": "Battery",
+      "type": "group",
+      "content": "{{ '{:.2f}'.format(-1*(states('sensor.battery_discharging')|float(0))) if states('sensor.battery_discharging')|float(0) > 0 else '{:.2f}'.format(states('sensor.battery_charging')|float(0)) }} kW",
+      "items": [
+        {
+          "entity": "sensor.battery_pack_1_current",
+          "name": "Pack 1",
+          "type": "info",
+          "content": "{{ '{:.2f}'.format(states('sensor.battery_pack_1_current')|float(0)) }} A"
+        },
+        {
+          "entity": "sensor.battery_pack_1_current",
+          "name": "Pack 2",
+          "type": "info",
+          "content": "{{ '{:.2f}'.format(states('sensor.battery_pack_2_current')|float(0)) }} A"
+        }
+      ]
+    },
+    {
+      "entity": "sensor.total_power",
+      "name": "Home",
+      "type": "info",
+      "content": "{{ '{:.2f}'.format(states('sensor.total_power')|float(0)) }} kW"
+    },
+    {
+      "entity": "sensor.grid_import_power",
+      "name": "Grid",
+      "type": "info",
+      "content": "{{ '{:.2f}'.format(states('sensor.grid_import_power')|float(0)) }} kW"
+    },
+    {
+      "name": "Aircon",
+      "title": "Aircon",
+      "type": "group",
+      "content": "Rm {{ ', '.join(set(['1' if is_state('binary_sensor.aircon1_running', 'on') else '', '2' if is_state('binary_sensor.aircon2_running', 'on') else '', '3' if is_state('binary_sensor.aircon3_running', 'on') else '']).difference([''])) }}",
+      "items": [
+        {
+          "entity": "switch.aircon1",
+          "name": "Room 1",
+          "type": "toggle"
+        },
+        {
+          "entity": "switch.aircon2",
+          "name": "Room 2",
+          "type": "toggle"
+        },
+        {
+          "entity": "switch.aircon3",
+          "name": "Room 3",
+          "type": "toggle"
+        },
+        {
+          "entity": "automation.turn_off_aircon",
+          "name": "Turn off ALL",
+          "type": "tap",
+          "tap_action": {
+            "service": "automation.trigger"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Night Light",
+      "title": "Night Light",
+      "type": "group",
+      "content": "{{ ', '.join(set(['Home' if is_state('switch.home_night_light_switch', 'on') else '', 'Stock Room' if is_state('switch.stock_room_night_light_switch', 'on') else '']).difference([''])) }}",
+      "items": [
+        {
+          "entity": "switch.home_night_light_switch",
+          "name": "Home",
+          "type": "toggle"
+        },
+        {
+          "entity": "switch.stock_room_night_light_switch",
+          "name": "Stock Room",
+          "type": "toggle"
+        }
+      ]
+    }
+  ]
+}
