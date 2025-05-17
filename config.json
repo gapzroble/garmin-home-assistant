@@ -5,14 +5,22 @@
     {
       "entity": "sensor.solar_power",
       "name": "Solar",
-      "type": "info",
-      "content": "{{ '{:.2f}'.format(states('sensor.solar_power')|float(0)) }} kW"
-    },    
+      "content": "{{ '{:.2f}'.format(states('sensor.solar_power')|float(0)) }} kW",
+      "type": "group",
+      "items": [
+        {
+          "entity": "sensor.solar_excess_power",
+          "name": "Excess",
+          "type": "info",
+          "content": "{{ '{:.2f}'.format(states('sensor.solar_excess_power')|float(0)) }} kW"
+        }
+      ]
+    },
     {
-      "entity": "sensor.battery_discharging",
+      "entity": "sensor.battery_power",
       "name": "Battery",
       "type": "group",
-      "content": "{{ '{:.2f}'.format(-1*(states('sensor.battery_discharging')|float(0))) if states('sensor.battery_discharging')|float(0) > 0 else '{:.2f}'.format(states('sensor.battery_charging')|float(0)) }} kW",
+      "content": "{{ '{:.2f}'.format(states('sensor.battery_power')|float(0)) if states('sensor.battery_power')|float(0) > 0 else '{:.1f}'.format(states('sensor.battery_power')|float(0)) }} kW",
       "items": [
         {
           "entity": "sensor.battery_pack_1_current",
@@ -31,20 +39,40 @@
     {
       "entity": "sensor.total_power",
       "name": "Home",
-      "type": "info",
-      "content": "{{ '{:.2f}'.format(states('sensor.total_power')|float(0)) }} kW"
-    },
-    {
-      "entity": "sensor.grid_import_power",
-      "name": "Grid",
-      "type": "info",
-      "content": "{{ '{:.2f}'.format(states('sensor.grid_import_power')|float(0)) }} kW"
+      "content": "{{ '{:.2f}'.format(states('sensor.total_power')|float(0)) }} kW",
+      "type": "group",
+      "items": [
+        {
+          "entity": "sensor.grid_import_power",
+          "name": "Grid",
+          "type": "info",
+          "content": "{{ '{:.2f}'.format(states('sensor.grid_import_power')|float(0)) }} kW"
+        },
+        {
+          "entity": "sensor.solar_excess_power",
+          "name": "Solar",
+          "type": "info",
+          "content": "{{ '{:.2f}'.format(states('sensor.solar_excess_power')|float(0)) }} kW"
+        },
+        {
+          "entity": "sensor.battery_discharging",
+          "name": "Battery",
+          "type": "info",
+          "content": "{{ '{:.2f}'.format(states('sensor.battery_discharging')|float(0)) }} kW"
+        },
+        {
+          "entity": "sensor.total_power",
+          "name": "Total",
+          "type": "info",
+          "content": "{{ '{:.2f}'.format(states('sensor.total_power')|float(0)) }} kW"
+        }
+      ]
     },
     {
       "name": "Aircon",
       "title": "Aircon",
       "type": "group",
-      "content": "Rm {{ ', '.join(set(['1' if is_state('binary_sensor.aircon1_running', 'on') else '', '2' if is_state('binary_sensor.aircon2_running', 'on') else '', '3' if is_state('binary_sensor.aircon3_running', 'on') else '']).difference([''])) }}",
+      "content": "Rm {{ ', '.join(set(['1' if is_state('binary_sensor.aircon1_running', 'on') else '', '2' if is_state('binary_sensor.aircon2_running', 'on') else '', '3' if is_state('binary_sensor.aircon3_running', 'on') else '']).difference([''])|sort) }}",
       "items": [
         {
           "entity": "switch.aircon1",
@@ -86,6 +114,14 @@
           "entity": "switch.stock_room_night_light_switch",
           "name": "Stock Room",
           "type": "toggle"
+        },
+        {
+          "entity": "automation.turn_off_lights_outside",
+          "name": "Turn off ALL",
+          "type": "tap",
+          "tap_action": {
+            "service": "automation.trigger"
+          }
         }
       ]
     }
